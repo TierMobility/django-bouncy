@@ -125,6 +125,8 @@ You can adjust the cache you wish Django Bouncy to store the certificate in by c
 
 ``BOUNCY_CERT_DOMAIN_REGEX`` - A string that contains the regular expression that should be used to verify the URL of Amazon's public SNS certificate is indeed hosted on Amazon. The default is ``sns.[a-z0-9\-]+.amazonaws.com$`` (which will match sns.region.amazonaws.com) and it's unlikely you'll need to change this.
 
+``BOUNCY_USE_EVENTS`` - A boolean that decides if you want to use SES Notifications or Events. Default: True.
+
 
 Credits
 -------

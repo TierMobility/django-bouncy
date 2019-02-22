@@ -18,6 +18,11 @@ from django_bouncy.utils import (
 from django_bouncy.models import Bounce, Complaint, Delivery
 from django_bouncy import signals
 
+if getattr(settings, 'BOUNCY_USE_EVENTS', True):
+    TYPE_FIELD_NAME = 'eventType'
+else:
+    TYPE_FIELD_NAME = 'notificationType'
+
 VITAL_NOTIFICATION_FIELDS = [
     'Type', 'Message', 'Timestamp', 'Signature',
     'SignatureVersion', 'TopicArn', 'MessageId',
@@ -25,7 +30,7 @@ VITAL_NOTIFICATION_FIELDS = [
 ]
 
 VITAL_MESSAGE_FIELDS = [
-    'notificationType', 'mail'
+    TYPE_FIELD_NAME, 'mail'
 ]
 
 ALLOWED_TYPES = [
@@ -132,7 +137,7 @@ def process_message(message, notification):
     """
     Function to process a JSON message delivered from Amazon
     """
-    # Confirm that there are 'notificationType' and 'mail' fields in our
+    # Confirm that there are TYPE_FIELD_NAME and 'mail' fields in our
     # message
     if not set(VITAL_MESSAGE_FIELDS) <= set(message):
         # At this point we're sure that it's Amazon sending the message
@@ -141,11 +146,11 @@ def process_message(message, notification):
         logger.info('JSON Message Missing Vital Fields')
         return HttpResponse('Missing Vital Fields')
 
-    if message['notificationType'] == 'Complaint':
+    if message[TYPE_FIELD_NAME] == 'Complaint':
         return process_complaint(message, notification)
-    if message['notificationType'] == 'Bounce':
+    if message[TYPE_FIELD_NAME] == 'Bounce':
         return process_bounce(message, notification)
-    if message['notificationType'] == 'Delivery':
+    if message[TYPE_FIELD_NAME] == 'Delivery':
         return process_delivery(message, notification)
     else:
         return HttpResponse('Unknown Notification Type')
